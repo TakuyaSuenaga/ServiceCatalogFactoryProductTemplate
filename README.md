@@ -10,20 +10,36 @@
 
 ### セットアップ (Secrets)
 
-いずれかの認証方法を設定してください。
+OIDCでロール引受けによる認証を使用します。
 
-1) OIDCでロール引受け
+**必須Secrets:**
 - `AWS_ROLE_TO_ASSUME`: 引受けるIAMロールARN
 - `AWS_REGION`: AWSリージョン (例: ap-northeast-1)
-
-2) アクセスキー方式
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_REGION`
-
-S3アップロード先の指定（どちらか/両方）
 - `S3_BUCKET`: デフォルトのアップロード先バケット名
-- `S3_KEY`: デフォルトのオブジェクトキー（省略時は `product.zip`）
+
+**IAMロールの信頼ポリシー例:**
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::ACCOUNT-ID:oidc-provider/token.actions.githubusercontent.com"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": "repo:OWNER/REPO:*"
+        }
+      }
+    }
+  ]
+}
+```
 
 ### 手動実行 (workflow_dispatch)
 
@@ -42,11 +58,11 @@ Actions タブから `Upload Product Template to S3` を選び、以下の入力
 2. 差分検出で `templates/**` の変更ファイル一覧を生成
 3. 変更ファイルごとに並列ジョブを生成（マトリクス）
 4. 各ジョブで対象テンプレートを `zip` 化
-5. AWS 認証を設定（OIDC もしくは アクセスキー）
+5. AWS 認証を設定（OIDC ロール引受け）
 6. `aws s3 cp` で S3 にアップロード（キーは相対パスを `.zip` に置換）
 
 ### 事前要件
 
 - `templates/path/to/template/*.yaml(yml)` が存在すること
 - ワークフローを動かす環境に Secrets が設定済みであること
-  - `S3_KEY` は不要になりました
+- GitHub OIDC プロバイダーが AWS アカウントに設定済みであること
