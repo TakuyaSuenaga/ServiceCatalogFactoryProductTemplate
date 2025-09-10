@@ -16,7 +16,7 @@ on:
     branches:
       - main
     paths:
-      - templates/**
+      - templates/**/product.template.yaml
       - .github/workflows/upload-product.yml
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
             fi
           fi
           echo "Base: $BASE"
-          mapfile -t CHANGED < <(git diff --name-only "$BASE" "$GITHUB_SHA" -- 'templates/**' | grep -E '\.ya?ml$' || true)
+          mapfile -t CHANGED < <(git diff --name-only "$BASE" "$GITHUB_SHA" -- 'templates/**' | grep -E 'product\.template\.ya?ml$' || true)
           # Filter out deleted files
           FILTERED=()
           for f in "${CHANGED[@]}"; do

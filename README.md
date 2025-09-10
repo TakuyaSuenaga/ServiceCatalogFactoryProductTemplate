@@ -2,7 +2,7 @@
 
 ## GitHub Actions: Upload templates to S3
 
-このリポジトリには、`templates/` 配下のテンプレートファイル（`.yaml` or `.yml`）を `zip` 化し、変更があったファイルのみ S3 にアップロードする GitHub Actions ワークフローを含みます。
+このリポジトリには、`templates/` 配下の `product.template.yaml` ファイルを `zip` 化し、変更があったファイルのみ S3 にアップロードする GitHub Actions ワークフローを含みます。
 
 ### ワークフローの場所
 
@@ -50,12 +50,12 @@ Actions タブから `Upload Product Template to S3` を選び、以下の入力
 
 ### 自動実行 (push)
 
-`main` ブランチに `templates/**` の変更が push された場合に自動で実行されます。差分検出ジョブが `git diff` で変更されたテンプレートのみを検出し、マトリクスで並列アップロードします。
+`main` ブランチに `templates/**/product.template.yaml` の変更が push された場合に自動で実行されます。差分検出ジョブが `git diff` で変更された `product.template.yaml` のみを検出し、マトリクスで並列アップロードします。
 
 ### 動作概要
 
 1. リポジトリをチェックアウト
-2. 差分検出で `templates/**` の変更ファイル一覧を生成
+2. 差分検出で `templates/**/product.template.yaml` の変更ファイル一覧を生成
 3. 変更ファイルごとに並列ジョブを生成（マトリクス）
 4. 各ジョブで対象テンプレートを `zip` 化
 5. AWS 認証を設定（OIDC ロール引受け）
@@ -63,6 +63,6 @@ Actions タブから `Upload Product Template to S3` を選び、以下の入力
 
 ### 事前要件
 
-- `templates/path/to/template/*.yaml(yml)` が存在すること
+- `templates/path/to/template/product.template.yaml` が存在すること
 - ワークフローを動かす環境に Secrets が設定済みであること
 - GitHub OIDC プロバイダーが AWS アカウントに設定済みであること
